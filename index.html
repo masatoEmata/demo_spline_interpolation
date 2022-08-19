@@ -1,0 +1,145 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>zahyo</title>
+<link rel="stylesheet" href="zahyo-wp.css" type="text/css">
+</head>
+ <body>
+  <h1>画面上をなぞってみよう</h1>
+  <div id="box">.</div>
+  <div id="box2"></div>
+  <div id="count">
+    <div class="zahyou">
+     <h3>x座標</h3>
+     <p id="x-pos"></p>
+    </div>
+    <div class="zahyou">
+     <h3>y座標</h3>
+     <p id="y-pos"></p>
+    </div>
+  </div>
+  <div id="count">
+    <div>
+      <h3>全座標</h3>
+      <p id="all-pos"></p>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script>
+   $(function(){
+      var box = $("#box2");
+      var boxOffset = box.offset();
+      var minX = Math.floor(boxOffset.left);
+      var minY = Math.floor(boxOffset.top);
+      var maxX = Math.floor(boxOffset.left + box.width());
+      var maxY = Math.floor(boxOffset.top + box.height());
+      var x = 0;//初期値
+      var y = 0;
+      var trace = 0;
+     //タッチが始まった時、指が離れた時、指を動かし動かしている時の3パターンの動き
+      if('ontouchstart' in document){//タッチイベントが有効な場合
+        $("html").on('touchstart',function(){
+          event.preventDefault();//画面が動かないようにする
+          trace = 1;
+          traceFunc();//後述の関数を実行
+        });
+        $("html").on('touchend',function(){
+          trace = 0;
+        });
+        $("html").on('touchmove',function(){
+          x = event.changedTouches[0].clientX;//イベントが発生したタッチされているウィンドウ上の座標
+          y = event.changedTouches[0].clientY;//ちなみに[0]を[1]にするとマルチタッチの２本目の指の位置を取得できる
+        });
+       }
+      else {//タッチイベントが有効でない場合(PC)の3パターンの動き
+        $("html").on('mousedown',function(){
+          trace = 1;
+          traceFunc();
+        });
+        $("html").on('mouseup',function(){
+          trace = 0;
+          traceFunc();
+        });
+        $("html").on('mousemove',function(event){
+          x = event.clientX;//イベントが発生したウィンドウ上の座標
+          y = event.clientY;
+        });
+       };
+
+   let all_xy = [];
+   let all_xy_str = '';
+
+   traceFunc = function(){
+     if(trace){//trace = 1;の状態
+      all_xy.push([x, y])
+      all_xy_str += `[${x}, ${y}], `
+      $("#x-pos").text(x);//#x-posにxの値を挿入する
+      $("#y-pos").text(y);
+     if(x > minX && x < maxX && y > minY && y < maxY){//#box2の枠の範囲のとき
+      $("#box").clone().css(//#boxをクローンしてcssを書き換え、bodyに追加する
+        {'left': x + 'px','top': y + 'px','color': 'orange'}
+        ).appendTo("body");
+        document.querySelector('p#all-pos').textContent = all_xy_str;
+        console.log(all_xy)
+     }
+     setTimeout(traceFunc,100);//traceFunc関数を0.1秒ごとに繰り返す
+     }
+    }
+   });
+
+   </script>
+   <style>
+ body{
+    color:#444;
+    background:  #F0FFFF;
+    width:100vw;
+    margin:0 auto;
+    font-family: "Hiragino Kaku Gothic ProN","メイリオ", sans-serif;
+  }
+  h1{
+    font-size:2.5em;
+    margin:1em auto;
+    text-align:center;
+  }
+  #box {
+    position: absolute;
+    color: transparent;
+    margin: -0.5em 0 0 -0.5em;
+    font-size: 0.1em;
+  }
+  #box2{
+    width:100vw;
+    height:60vh;
+    overflow: hidden;
+    position:relative;
+    background: #00679F;
+    cursor: pointer;
+    box-shadow: 0 0.1em 0.1em rgba(0,0,0, 0.3);
+  }
+  #box2 #box{
+    color:#FDD800;
+  }
+  #count{
+    text-align:center;
+  }
+  p {
+    background: #fff;
+    width:11em;
+    height: 2em;
+    padding:2em;
+    text-align: center;
+    border-radius:0.3em;
+    box-shadow: 0 0.1em 0.1em rgba(0,0,0, 0.3);
+  }
+  .zahyou{
+    display:inline-block;
+    margin:0.8em;
+  }
+  h3{
+    font-size:1.5em;
+    text-align:center;
+  }
+  p#all-pos {
+    width: 100%;
+  }
+</style>
+</body></html>
