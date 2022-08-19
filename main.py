@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # https://www.web-dev-qa-db-ja.com/ja/python/%E9%96%89%E6%9B%B2%E7%B7%9A%E3%82%92%E4%B8%80%E9%80%A3%E3%81%AE%E7%82%B9%E3%81%AB%E9%81%A9%E5%90%88%E3%81%95%E3%81%9B%E3%82%8B/1054592661/
 # define pts from the question
 
-def clean_char_data(data):
+def clean_char_data(data, max_height):
     # data = sorted(data)
     x_list = []
     y_list = []
@@ -14,15 +14,15 @@ def clean_char_data(data):
         while x in x_list:
             x = x * 1.0001
         x_list.append(x)
-        y = 400 - point[1]
+        y = max_height - point[1]
         if y in y_list:
             y = y * 1.0001
         y_list.append(y)
     return [list(p) for p in zip(x_list, y_list)]
 
 
-def simple_line_plot(data, point_num=1000):
-    data = clean_char_data(data)
+def simple_line_plot(data, point_num=1000, max_height=500):
+    data = clean_char_data(data, max_height)
     pts = np.array(data)
     tck, u = splprep(pts.T, u=None, s=0.0)
     print(f'knot vector .. length: {len(tck[0])} \n{tck[0]}\n')
